@@ -1,23 +1,27 @@
 import { useState } from "react";
-import { Container, VStack, HStack, Text, Box, Button, Input, Textarea, IconButton } from "@chakra-ui/react";
+import { Container, VStack, HStack, Text, Box, Button, Textarea, IconButton } from "@chakra-ui/react";
 import { FaThumbsUp, FaHeart, FaLaugh } from "react-icons/fa";
+import { usePosts, useAddPost, useAddReaction } from '../integrations/supabase/api';
 
 const Index = () => {
-  const [posts, setPosts] = useState([]);
+  const { data: posts = [], isLoading, isError } = usePosts();
   const [newPost, setNewPost] = useState("");
 
+  const addPostMutation = useAddPost();
   const addPost = () => {
     if (newPost.trim() !== "") {
-      setPosts([...posts, { content: newPost, reactions: { thumbsUp: 0, heart: 0, laugh: 0 } }]);
+      addPostMutation.mutate({ title: newPost, body: newPost, author_id: 'user-id-placeholder' });
       setNewPost("");
     }
   };
 
-  const addReaction = (index, reaction) => {
-    const updatedPosts = [...posts];
-    updatedPosts[index].reactions[reaction]++;
-    setPosts(updatedPosts);
+  const addReactionMutation = useAddReaction();
+  const addReaction = (postId, reaction) => {
+    addReactionMutation.mutate({ post_id: postId, user_id: 'user-id-placeholder', emoji: reaction });
   };
+
+  if (isLoading) return <Text>Loading...</Text>;
+  if (isError) return <Text>Error loading posts.</Text>;
 
   return (
     <Container centerContent maxW="container.md" py={8}>
@@ -41,7 +45,7 @@ const Index = () => {
                   <IconButton
                     aria-label="Thumbs Up"
                     icon={<FaThumbsUp />}
-                    onClick={() => addReaction(index, "thumbsUp")}
+                    onClick={() => addReaction(post.id, "👍")}
                   />
                   <Text>{post.reactions.thumbsUp}</Text>
                 </HStack>
@@ -49,7 +53,7 @@ const Index = () => {
                   <IconButton
                     aria-label="Heart"
                     icon={<FaHeart />}
-                    onClick={() => addReaction(index, "heart")}
+                    onClick={() => addReaction(post.id, "❤️")}
                   />
                   <Text>{post.reactions.heart}</Text>
                 </HStack>
@@ -57,7 +61,7 @@ const Index = () => {
                   <IconButton
                     aria-label="Laugh"
                     icon={<FaLaugh />}
-                    onClick={() => addReaction(index, "laugh")}
+                    onClick={() => addReaction(post.id, "😂")}
                   />
                   <Text>{post.reactions.laugh}</Text>
                 </HStack>
