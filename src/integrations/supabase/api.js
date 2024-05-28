@@ -25,7 +25,7 @@ const fromSupabase = async (query) => {
 // Queries
 export const usePosts = () => useQuery({
     queryKey: ['posts'],
-    queryFn: () => fromSupabase(supabase.from('posts').select('*')),
+    queryFn: () => fromSupabase(supabase.from('posts').select('*, reactions(*)')),
 });
 
 export const useReactions = () => useQuery({

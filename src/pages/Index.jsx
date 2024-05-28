@@ -16,6 +16,9 @@ const Index = () => {
   };
 
   const addReactionMutation = useAddReaction();
+  const countReactions = (reactions, emoji) => {
+    return reactions.filter(reaction => reaction.emoji === emoji).length;
+  };
   const addReaction = (postId, reaction) => {
     addReactionMutation.mutate({ post_id: postId, user_id: 'user-id-placeholder', emoji: reaction });
   };
@@ -39,7 +42,7 @@ const Index = () => {
         <VStack spacing={4} width="100%">
           {posts.map((post, index) => (
             <Box key={index} p={4} borderWidth="1px" borderRadius="md" width="100%">
-              <Text mb={2}>{post.content}</Text>
+              <Text mb={2}>{post.body}</Text>
               <HStack spacing={4}>
                 <HStack>
                   <IconButton
@@ -47,7 +50,7 @@ const Index = () => {
                     icon={<FaThumbsUp />}
                     onClick={() => addReaction(post.id, "👍")}
                   />
-                  <Text>{post.reactions.thumbsUp}</Text>
+                  <Text>{countReactions(post.reactions, "👍")}</Text>
                 </HStack>
                 <HStack>
                   <IconButton
@@ -55,7 +58,7 @@ const Index = () => {
                     icon={<FaHeart />}
                     onClick={() => addReaction(post.id, "❤️")}
                   />
-                  <Text>{post.reactions.heart}</Text>
+                  <Text>{countReactions(post.reactions, "❤️")}</Text>
                 </HStack>
                 <HStack>
                   <IconButton
@@ -63,7 +66,7 @@ const Index = () => {
                     icon={<FaLaugh />}
                     onClick={() => addReaction(post.id, "😂")}
                   />
-                  <Text>{post.reactions.laugh}</Text>
+                  <Text>{countReactions(post.reactions, "😂")}</Text>
                 </HStack>
               </HStack>
             </Box>
